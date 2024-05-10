@@ -7,11 +7,13 @@ import { RecipesModule } from './recipes/recipes.module';
 @Module({
   imports: [
     RecipesModule,
-    // MongooseModule.forRoot('mongodb://127.0.0.1:27017/recipes'),
+    /* MongooseModule.forRoot(
+      'mongodb+srv://bettinimarcelo:0MoMQHiDOQtynXbo@nest-crud.50wvbao.mongodb.net/?retryWrites=true&w=majority&appName=nest-crud',
+    ), */
 
     MongooseModule.forRootAsync({
       useFactory: () => ({
-        uri: 'mongodb://127.0.0.1:27017/recipes',
+        uri: 'mongodb+srv://bettinimarcelo:0MoMQHiDOQtynXbo@nest-crud.50wvbao.mongodb.net/?retryWrites=true&w=majority&appName=nest-crud',
       }),
     }),
   ],

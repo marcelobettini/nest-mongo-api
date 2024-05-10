@@ -25,8 +25,8 @@ export class RecipesService {
   }
 
   async findAll(): Promise<Recipe[]> {
-    const recipes = this.recipeModel.find().exec();
-    if (!recipes) throw new NotFoundException('Recipe not found');
+    const recipes = await this.recipeModel.find().exec();
+    if (!recipes.length) throw new NotFoundException('No recipes found');
     return recipes;
   }
 
@@ -41,11 +41,7 @@ export class RecipesService {
     }
     return recipe;
   }
-  async findByName(
-    name: string,
-    time?: number,
-    ingredients?: string[],
-  ): Promise<Recipe[]> {
+  async findByName(name: string, time?: number): Promise<Recipe[]> {
     let query = this.recipeModel.find();
     if (name) {
       query = query.find({ name: { $regex: new RegExp(name, 'i') } });
@@ -54,12 +50,10 @@ export class RecipesService {
     if (time) {
       query = query.find({ time: { $lte: time } });
     }
-
-    if (ingredients && ingredients.length > 0) {
-      query = query.find({ ingredients: { $all: ingredients } });
-    }
-
-    return query.exec();
+    const result = await query.exec();
+    console.log(result);
+    if (!result) throw new NotFoundException('No recipes match that criteria');
+    return result;
   }
 
   update(id: string, updateRecipeDto: UpdateRecipeDto) {
@@ -73,7 +67,13 @@ export class RecipesService {
   3. updateRecipeDto: The data you want to update. It should match the structure of your Mongoose schema.
   4. { new: true }: This option ensures that the updated document is returned after the update operation. */
 
-  remove(id: string) {
-    return this.recipeModel.findByIdAndDelete(id).exec();
+  async remove(id: string) {
+    if (!id.match(/^[0-9a-fA-F]{24}$/)) {
+      throw new BadRequestException('Invalid ID format');
+    }
+    const deleted = await this.recipeModel.findByIdAndDelete(id).exec();
+    if (!deleted) {
+      throw new NotFoundException(`Cannot delete. No Recipe with id ${id}.`);
+    }
   }
 }

@@ -31,9 +31,8 @@ export class RecipesController {
   async findByName(
     @Query('name') name: string,
     @Query('time') time: number, // Optional query parameter for time
-    @Query('ingredients') ingredients: string[], // Optional query parameter for ingredients
   ): Promise<Recipe[]> {
-    return this.recipesService.findByName(name, time, ingredients);
+    return this.recipesService.findByName(name, time);
   }
 
   @Get(':id')
