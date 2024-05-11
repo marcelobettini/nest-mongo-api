@@ -2,13 +2,13 @@ import { Model } from 'mongoose';
 import {
   Injectable,
   NotFoundException,
-  BadRequestException,
   InternalServerErrorException,
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { CreateRecipeDto } from './dto/create-recipe.dto';
 import { UpdateRecipeDto } from './dto/update-recipe.dto';
 import { Recipe } from './schemas/recipe.schema';
+import idValidate from 'src/utils/idValidate';
 
 @Injectable()
 export class RecipesService {
@@ -32,9 +32,7 @@ export class RecipesService {
 
   async findOne(id: string): Promise<Recipe> {
     // Validate ID format
-    if (!id.match(/^[0-9a-fA-F]{24}$/)) {
-      throw new BadRequestException('Invalid ID format');
-    }
+    idValidate(id);
     const recipe = await this.recipeModel.findById(id).exec();
     if (!recipe) {
       throw new NotFoundException('Recipe not found');
@@ -57,8 +55,9 @@ export class RecipesService {
   }
 
   update(id: string, updateRecipeDto: UpdateRecipeDto) {
+    idValidate(id);
     return this.recipeModel
-      .findByIdAndUpdate(id, UpdateRecipeDto, { new: true })
+      .findByIdAndUpdate(id, updateRecipeDto, { new: true })
       .exec();
   }
   /* 
@@ -68,9 +67,7 @@ export class RecipesService {
   4. { new: true }: This option ensures that the updated document is returned after the update operation. */
 
   async remove(id: string) {
-    if (!id.match(/^[0-9a-fA-F]{24}$/)) {
-      throw new BadRequestException('Invalid ID format');
-    }
+    idValidate(id);
     const deleted = await this.recipeModel.findByIdAndDelete(id).exec();
     if (!deleted) {
       throw new NotFoundException(`Cannot delete. No Recipe with id ${id}.`);
