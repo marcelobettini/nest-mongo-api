@@ -4,6 +4,7 @@ import { AppService } from './app.service';
 import { MongooseModule } from '@nestjs/mongoose';
 import { RecipesModule } from './recipes/recipes.module';
 import { ConfigModule } from '@nestjs/config';
+import { HealthModule } from './health/health.module';
 
 @Module({
   imports: [
@@ -17,6 +18,8 @@ import { ConfigModule } from '@nestjs/config';
         uri: process.env.MONGO_URI,
       }),
     }),
+
+    HealthModule,
   ],
   controllers: [AppController],
   providers: [AppService],
