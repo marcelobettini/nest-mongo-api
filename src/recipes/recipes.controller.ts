@@ -27,12 +27,13 @@ export class RecipesController {
     return this.recipesService.findAll();
   }
 
-  @Get('search')
-  async findByName(
-    @Query('name') name: string,
-    @Query('time') time: number, // Optional query parameter for time
-  ): Promise<Recipe[]> {
-    return this.recipesService.findByName(name, time);
+  @Get('searchByName')
+  async findByName(@Query('name') name: string): Promise<Recipe[]> {
+    return this.recipesService.findByName(name);
+  }
+  @Get('searchByTime')
+  async findByMaxTime(@Query('time') time: number): Promise<Recipe[]> {
+    return this.recipesService.findByMaxTime(time);
   }
 
   @Get(':id')

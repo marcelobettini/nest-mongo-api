@@ -17,10 +17,9 @@ export class RecipesService {
   async create(createRecipeDto: CreateRecipeDto): Promise<Recipe> {
     try {
       const createdRecipe = new this.recipeModel(createRecipeDto);
-      return createdRecipe.save();
+      return await createdRecipe.save();
     } catch (error) {
-      console.error('Error while creating recipe:', error);
-      throw new InternalServerErrorException('Failed to create recipe');
+      throw new InternalServerErrorException(error.message);
     }
   }
 
@@ -39,24 +38,24 @@ export class RecipesService {
     }
     return recipe;
   }
-  async findByName(name: string, time?: number): Promise<Recipe[]> {
+  async findByName(name: string): Promise<Recipe[]> {
     let query = this.recipeModel.find();
-    if (name) {
-      query = query.find({ name: { $regex: new RegExp(name, 'i') } });
-    }
-
-    if (time) {
-      query = query.find({ time: { $lte: time } });
-    }
+    query = query.find({ name: { $regex: new RegExp(name, 'i') } });
     const result = await query.exec();
-    console.log(result);
+    if (!result) throw new NotFoundException('No recipes match that criteria');
+    return result;
+  }
+  async findByMaxTime(time: number): Promise<Recipe[]> {
+    let query = this.recipeModel.find();
+    query = query.find({ time: { $lte: time } });
+    const result = await query.exec();
     if (!result) throw new NotFoundException('No recipes match that criteria');
     return result;
   }
 
-  update(id: string, updateRecipeDto: UpdateRecipeDto) {
+  async update(id: string, updateRecipeDto: UpdateRecipeDto) {
     idValidate(id);
-    return this.recipeModel
+    return await this.recipeModel
       .findByIdAndUpdate(id, updateRecipeDto, { new: true })
       .exec();
   }
