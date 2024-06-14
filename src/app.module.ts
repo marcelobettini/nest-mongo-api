@@ -3,17 +3,18 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { MongooseModule } from '@nestjs/mongoose';
 import { RecipesModule } from './recipes/recipes.module';
+import { ConfigModule } from '@nestjs/config';
 
 @Module({
   imports: [
     RecipesModule,
-    /* MongooseModule.forRoot(
-      'mongodb+srv://bettinimarcelo:0MoMQHiDOQtynXbo@nest-crud.50wvbao.mongodb.net/?retryWrites=true&w=majority&appName=nest-crud',
-    ), */
+    ConfigModule.forRoot({
+      envFilePath: ['.env.development', '.env.local', '.env'],
+    }),
 
     MongooseModule.forRootAsync({
       useFactory: () => ({
-        uri: `mongodb+srv://bettinimarcelo:sAHRdnGcdfrU03RV@cluster0.ftoag2o.mongodb.net/recipesdb?retryWrites=true&w=majority&appName=Cluster0/recipes`,
+        uri: process.env.MONGO_URI,
       }),
     }),
   ],
